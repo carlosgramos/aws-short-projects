@@ -1,3 +1,3 @@
 # aws-short-projects
 
-A collection of short projects related to specific AWS technologies, such as Step Functions, and others.
+A collection of short scripts related to specific AWS services, such as Cloud9, and others.
