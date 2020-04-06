@@ -1,0 +1,48 @@
+#Returns pre-signed S3 URL's to upload files into S3 bucket
+import json
+from botocore.client import Config
+import boto3
+import os
+
+print('Loading function')
+
+s3 = boto3.client('s3', config=Config(signature_version='s3v4'))
+bucket = os.environ['FILE_BUCKET'] 
+
+def lambda_handler(event, context):
+    #print("Received event: " + json.dumps(event, indent=2))
+
+    try:
+        body = json.loads(event['body'])
+        key = body.get('key')
+        fields = body.get('fields')
+        conditions = body.get('conditions')
+        
+        s3response = s3.generate_presigned_post(
+          bucket, 
+          key, 
+          Fields=fields,
+          Conditions= conditions,
+          ExpiresIn=3600
+        )
+    
+        return {
+          'statusCode': '200',
+          'body': json.dumps(s3response),
+          'headers': {
+            'Access-Control-Allow-Origin' : '*',
+            'Content-Type': 'application/json'
+          }
+        }
+        
+    except Exception as e:
+        print(e)
+        
+        return {
+          'statusCode': '500',
+          'body': 'Error: {}'.format(e),
+          'headers': {
+            'Access-Control-Allow-Origin' : '*',
+            'Content-Type': 'application/json'
+            }
+        }
