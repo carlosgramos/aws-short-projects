@@ -1,0 +1,25 @@
+    async fetchURL(s3Key) {
+      //This method gets a presigned s3 post from Lambda. The Lambda's IAM Role will be used for the upload.
+      try {
+          let data = {
+            "key": s3Key,
+            "fields": {
+              "x-amz-meta-dataset-name": this.datasetName,
+              "x-amz-meta-dataset-comment": this.datasetComment
+            },
+            "conditions": [
+              {"x-amz-meta-dataset-name": this.datasetName},
+              {"x-amz-meta-dataset-comment": this.datasetComment}
+            ]
+          }
+          
+          let response = await this.$http.post(`${process.env.VUE_APP_API_GW_ROOT}/datasets`, data);
+          if (response.status == 200) {
+            return(response)  
+          } else {
+            return false
+          }
+        } catch(err) {
+          console.log(err)
+        }  
+    }
